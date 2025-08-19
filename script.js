@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 body: graphql,
             };
 
-            const response = await fetch(proxyUrl+targetUrl, requestOptions);
+            const response = await fetch(proxyUrl+encodeURIComponent(targetUrl), requestOptions);
             if(!response.ok) {
                 throw new Error("Unable to fetch the User details");
             }
