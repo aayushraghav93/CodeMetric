@@ -1,3 +1,36 @@
+addEventListener("fetch", (event) => event.respondWith(handle(event.request)));
+
+function withCors(resp) {
+  const r = new Response(resp.body, resp);
+  r.headers.set("Access-Control-Allow-Origin", "*");
+  r.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  r.headers.set("Access-Control-Allow-Headers", "*");
+  return r;
+}
+
+async function handle(req) {
+  if (req.method === "OPTIONS") {
+    return withCors(new Response(null, { status: 204 }));
+  }
+
+  const url = new URL(req.url);
+  // Expect target URL appended to the path, e.g. /https://leetcode.com/graphql/
+  const target =
+    decodeURIComponent(url.pathname.slice(1)) ||
+    "https://leetcode.com/graphql/";
+
+  const body = req.method === "GET" ? undefined : await req.text();
+  const resp = await fetch(target, {
+    method: req.method,
+    headers: {
+      "content-type": req.headers.get("content-type") || "application/json",
+    },
+    body,
+  });
+
+  return withCors(resp);
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 
 
@@ -34,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function() {
             //statsContainer.classList.add("hidden");
 
             // const response = await fetch(url);
-            const proxyUrl = 'https://proxy.corsfix.com/?' 
+            const proxyUrl = 'https://leetcode-metric.rkt-bruce01.workers.dev/' 
             const targetUrl = 'https://leetcode.com/graphql/';
             
             const myHeaders = new Headers();
@@ -50,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 body: graphql,
             };
 
-            const response = await fetch(proxyUrl+encodeURIComponent(targetUrl), requestOptions);
+            const response = await fetch(proxyUrl+targetUrl, requestOptions);
             if(!response.ok) {
                 throw new Error("Unable to fetch the User details");
             }
